@@ -22,6 +22,55 @@ bst_t *bst_search(const bst_t *tree, int value)
 	return (node);
 }
 /**
+ * node_replace - Function
+ *
+ * Description: Replace nodes in a BST.
+ *
+ * @root: Pointer to the root node.
+ *
+ * Return: The root node.
+ */
+bst_t *node_replace(bst_t *root)
+{
+	bst_t *node = root->right;
+
+	while (node->left != NULL)
+		node = node->left;
+	if (node == root->right)
+	{
+		node->parent = root->parent;
+		root->left->parent = node;
+		node->left = root->left;
+		node->right = NULL;
+		if (root->parent != NULL && root->parent->left == root)
+			root->parent->left = node;
+		if (root->parent != NULL && root->parent->right == root)
+			root->parent->right = node;
+		free(root);
+		return (node);
+	}
+	if (node->right != NULL)
+	{
+		node->parent->left = node->right;
+		node->right->parent = node->parent;
+	}
+	if (node->right == NULL && node->left == NULL)
+		node->parent->left = NULL;
+	if (root->parent != NULL && root->parent->left == root)
+		root->parent->left = node;
+	if (root->parent != NULL && root->parent->right == root)
+		root->parent->right = node;
+	node->parent = root->parent;
+	node->left = root->left;
+	node->right = root->right;
+	if (node->left != NULL)
+		node->left->parent = node;
+	if (node->right != NULL)
+		node->right->parent = node;
+	free(root);
+	return (node);
+}
+/**
  * bst_remove - Function
  *
  * Description: Removes a node from a Binary Search Tree.
@@ -39,7 +88,6 @@ bst_t *bst_remove(bst_t *root, int value)
 		return (NULL);
 	if (root->n == value && (root->left == NULL || root->right == NULL))
 	{
-		node = root;
 		if (node->left == NULL && node->right == NULL)
 		{
 			free(node);
@@ -59,28 +107,7 @@ bst_t *bst_remove(bst_t *root, int value)
 	}
 	if (root->n == value)
 	{
-		node = node->right;
-		while (node->left != NULL)
-			node = node->left;
-		if (node->right != NULL)
-		{
-			node->parent->left = node->right;
-			node->right->parent = node->parent;
-		}
-		if (node->right == NULL && node->left == NULL)
-			node->parent->left = NULL;
-		if (root->parent != NULL && root->parent->left == root)
-			root->parent->left = node;
-		if (root->parent != NULL && root->parent->right == root)
-			root->parent->right = node;
-		node->parent = root->parent;
-		node->left = root->left;
-		node->right = root->right;
-		if (node->left != NULL)
-			node->left->parent = node;
-		if (node->right != NULL)
-			node->right->parent = node;
-		free(root);
+		node = node_replace(root);
 		return (node);
 	}
 	node = bst_search(root, value);
