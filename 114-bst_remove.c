@@ -90,6 +90,10 @@ bst_t *bst_remove(bst_t *root, int value)
 	{
 		if (node->left == NULL && node->right == NULL)
 		{
+			if (node->parent != NULL && node->parent->left == node)
+				node->parent->left = NULL;
+			if (node->parent != NULL && node->parent->right == node)
+				node->parent->right = NULL;
 			free(node);
 			return (NULL);
 		}
